@@ -24,6 +24,7 @@
       </div>
     </nav>
     <section class="content">
+      <button id="refereshQueue" class="float-right btn btn-primary">Refresh Queue</button>
       <table id="depositQueueTable" class="table table-striped">
         <thead>
           <tr>
@@ -91,22 +92,32 @@
           MODIFY FOR API
         **/
         // $.post('http://api.somethingtechie.co/bot/ubot/verify.php?ref=' + $("#verificationReferenceNumber").val(), {}, function(response){
-          var response = false
+          var response = true
+          console.log('tae')
           if(response * 1){
             $("#verificationSuccess").show()
+            if($("#depositQueueTable").find('.depositQueueTableRow[ref_id="'+$("#verificationReferenceNumber").val()+'"]').length){
+              $("#depositQueueTable").find('.depositQueueTableRow[ref_id="'+$("#verificationReferenceNumber").val()+'"]').remove()
+            }
           }else{
             $("#verificationFailed").show()
           }
         // })
       })
+      $('#refereshQueue').click(function(){
+        $('#depositQueueTable tbody').empty()
+        getQueue()
+      })
     })
     function getQueue(){
+      $('#depositQueueTable tbody').append('<tr><td colspan="6" class="text-center">Please wait...<td></tr>')
       /**
         MODIFY FOR API
       **/
       // $.get('http://api.somethingtechie.co/bot/ubot/deposits.php', {}, function(response){
 
         /* response contains the result data */
+        $('#depositQueueTable tbody').empty()
         var response = {
           "dataObj": [{
             "id":"1",
@@ -157,11 +168,12 @@
         }
         for(var x = 0; x < response.dataObj.length; x++){
           var rowClone = $('.prototype .depositQueueTableRow').clone()
+          rowClone.attr('ref_id', response.dataObj[x]['ref_id'])
           rowClone.find('.referenceNumber').text(response.dataObj[x]['ref_id'])
           rowClone.find('.accountNumber').text(response.dataObj[x]['account_number'])
           rowClone.find('.accountName').text(response.dataObj[x]['account_name'])
           rowClone.find('.amount').text(numberWithCommas(((response.dataObj[x]['amount']).replace(/\s*,\s*|\s+,/g, '')*1).toFixed(2)))
-          rowClone.find('.status').text(response.dataObj[x]['in_process'])
+          rowClone.find('.status').text(response.dataObj[x]['status'] === 'done' ? 'Done' : 'In Process')
           $('#depositQueueTable tbody').append(rowClone)
         }
       // });
