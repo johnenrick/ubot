@@ -44,21 +44,19 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Verify Depositor</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
           </div>
           <div class="modal-body">
             <form class="form-inline">
-              <label class="mr-sm-2" for="inlineFormCustomSelect">Reference Number: </label>
-              <input class="mb-2 mr-sm-2 mb-sm-0" id="verifyReferenceNumber">
+              <div class="form-group">
+                <label class="mr-sm-2" for="inlineFormCustomSelect">Reference Number: </label>
+                <input class="mb-2 mr-sm-2 mb-sm-0" id="verificationReferenceNumber" placeholder="Enter reference number">
 
-              <button type="submit" class="btn btn-primary">Verify</button>
-              <label class="mr-sm-2" for="inlineFormCustomSelect"> </label>
-              <small id="passwordHelpInline" class="text-muted">
-                Must be 8-20 characters long.
-              </small>
+              </div>
+
+              <button id="verifyReferenceNumber" type="button" class="btn btn-primary">Verify</button>
             </form>
+            <div id="verificationFailed" class="text-center text-danger">Invalid Reference Number!</div>
+            <div id="verificationSuccess"class="text-center text-success">Transaction finished!</div>
           </div>
           <div class="modal-footer">
           </div>
@@ -84,74 +82,93 @@
     $(document).ready(function(){
       getQueue()
       $('#depositQueueTable').on('click', '.verifyAction', function(){
+        $("#verificationFailed").hide()
+        $("#verificationSuccess").hide()
         $("#verifyModal").modal('show')
+      })
+      $('#verifyReferenceNumber').click(function(){
+        /**
+          MODIFY FOR API
+        **/
+        // $.post('http://api.somethingtechie.co/bot/ubot/verify.php?ref=' + $("#verificationReferenceNumber").val(), {}, function(response){
+          var response = false
+          if(response * 1){
+            $("#verificationSuccess").show()
+          }else{
+            $("#verificationFailed").show()
+          }
+        // })
       })
     })
     function getQueue(){
-
+      /**
+        MODIFY FOR API
+      **/
       // $.get('http://api.somethingtechie.co/bot/ubot/deposits.php', {}, function(response){
-      //   console.log(response)
+
+        /* response contains the result data */
+        var response = {
+          "dataObj": [{
+            "id":"1",
+            "account_name":"Edmund Cinco",
+            "account_number":"1234567890",
+            "amount":"10,000",
+            "ref_id":"111222",
+            "status":"in_process",
+            "created_at":"2017-07-15 16:34:47",
+            "updated_at":"0000-00-00 00:00:00"
+          }, {
+            "id":"2",
+            "account_name":"Mark Zuckerberg",
+            "account_number":"0987654321",
+            "amount":"15,720",
+            "ref_id":"333444",
+            "status":"done",
+            "created_at":"2017-07-15 16:36:34",
+            "updated_at":"2017-07-15 17:24:21"
+          }, {
+            "id":"3",
+            "account_name":"Test",
+            "account_number":"11",
+            "amount":"1000",
+            "ref_id":"555666",
+            "status":"in_process",
+            "created_at":"2017-07-15 16:49:31",
+            "updated_at":"0000-00-00 00:00:00"
+          },{
+            "id":"5",
+            "account_name":"test",
+            "account_number":"11",
+            "amount":"1000",
+            "ref_id":"871562",
+            "status":"in_process",
+            "created_at":"2017-07-15 17:36:49",
+            "updated_at":"0000-00-00 00:00:00"
+          },{
+            "id":"4",
+            "account_name":"Test",
+            "account_number":"11",
+            "amount":"20000",
+            "ref_id":"5969DAFE7217",
+            "status":"in_process",
+            "created_at":"2017-07-15 17:06:06",
+            "updated_at":"0000-00-00 00:00:00"
+          }]
+        }
+        for(var x = 0; x < response.dataObj.length; x++){
+          var rowClone = $('.prototype .depositQueueTableRow').clone()
+          rowClone.find('.referenceNumber').text(response.dataObj[x]['ref_id'])
+          rowClone.find('.accountNumber').text(response.dataObj[x]['account_number'])
+          rowClone.find('.accountName').text(response.dataObj[x]['account_name'])
+          rowClone.find('.amount').text(numberWithCommas(((response.dataObj[x]['amount']).replace(/\s*,\s*|\s+,/g, '')*1).toFixed(2)))
+          rowClone.find('.status').text(response.dataObj[x]['in_process'])
+          $('#depositQueueTable tbody').append(rowClone)
+        }
       // });
-      var response = {
-        "dataObj": [{
-          "id":"1",
-          "account_name":"Edmund Cinco",
-          "account_number":"1234567890",
-          "amount":"10,000",
-          "ref_id":"111222",
-          "status":"in_process",
-          "created_at":"2017-07-15 16:34:47",
-          "updated_at":"0000-00-00 00:00:00"
-        }, {
-          "id":"2",
-          "account_name":"Mark Zuckerberg",
-          "account_number":"0987654321",
-          "amount":"15,720",
-          "ref_id":"333444",
-          "status":"done",
-          "created_at":"2017-07-15 16:36:34",
-          "updated_at":"2017-07-15 17:24:21"
-        }, {
-          "id":"3",
-          "account_name":"Test",
-          "account_number":"11",
-          "amount":"1000",
-          "ref_id":"555666",
-          "status":"in_process",
-          "created_at":"2017-07-15 16:49:31",
-          "updated_at":"0000-00-00 00:00:00"
-        },{
-          "id":"5",
-          "account_name":"test",
-          "account_number":"11",
-          "amount":"1000",
-          "ref_id":"871562",
-          "status":"in_process",
-          "created_at":"2017-07-15 17:36:49",
-          "updated_at":"0000-00-00 00:00:00"
-        },{
-          "id":"4",
-          "account_name":"Test",
-          "account_number":"11",
-          "amount":"20000",
-          "ref_id":"5969DAFE7217",
-          "status":"in_process",
-          "created_at":"2017-07-15 17:06:06",
-          "updated_at":"0000-00-00 00:00:00"
-        }]
-      }
-      for(var x = 0; x < response.dataObj.length; x++){
-        var rowClone = $('.prototype .depositQueueTableRow').clone()
-        rowClone.find('.referenceNumber').text(response.dataObj[x]['ref_id'])
-        rowClone.find('.accountNumber').text(response.dataObj[x]['account_number'])
-        rowClone.find('.accountName').text(response.dataObj[x]['account_name'])
-        rowClone.find('.amount').text(numberWithCommas(((response.dataObj[x]['amount']).replace(/\s*,\s*|\s+,/g, '')*1).toFixed(2)))
-        rowClone.find('.status').text(response.dataObj[x]['in_process'])
-        $('#depositQueueTable tbody').append(rowClone)
-      }
-      function numberWithCommas(x) {
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      }
+
+    }
+    function numberWithCommas(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
   </script>
 </html>
