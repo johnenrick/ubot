@@ -1,0 +1,157 @@
+<html>
+  <head>
+    <title>UBot</title>
+    <link rel="stylesheet" href="./asset/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./asset/css/font-awesome.css">
+    <link rel="stylesheet" href="./asset/css/tether.min.css">
+    <script src="./asset/js/jquery.min.js"></script>
+    <script src="./asset/js/tether.min.js"></script>
+    <script src="./asset/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="#" style="color:#fb5a1e; font-weight:bold"><img src="./asset/img/logo.jpg" width="30" height="30" alt=""> <i>u</i>Bot</a>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Depositor's Queue</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <section class="content">
+      <table id="depositQueueTable" class="table table-striped">
+        <thead>
+          <tr>
+            <th>Reference</th>
+            <th>Account Number</th>
+            <th>Account Name</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </section>
+    <div id="verifyModal" class="modal fade">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Verify Depositor</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form class="form-inline">
+              <label class="mr-sm-2" for="inlineFormCustomSelect">Reference Number: </label>
+              <input class="mb-2 mr-sm-2 mb-sm-0" id="verifyReferenceNumber">
+
+              <button type="submit" class="btn btn-primary">Verify</button>
+              <label class="mr-sm-2" for="inlineFormCustomSelect"> </label>
+              <small id="passwordHelpInline" class="text-muted">
+                Must be 8-20 characters long.
+              </small>
+            </form>
+          </div>
+          <div class="modal-footer">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="prototype" style="display:none">
+      <table>
+        <tr class="depositQueueTableRow">
+          <td class="referenceNumber"></td>
+          <td class="accountNumber"></td>
+          <td class="accountName"></td>
+          <td class="amount text-right"></td>
+          <td class="status"></td>
+          <td>
+            <button class="verifyAction btn btn-primary btn-sm">Done</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+  <script>
+    $(document).ready(function(){
+      getQueue()
+      $('#depositQueueTable').on('click', '.verifyAction', function(){
+        $("#verifyModal").modal('show')
+      })
+    })
+    function getQueue(){
+
+      // $.get('http://api.somethingtechie.co/bot/ubot/deposits.php', {}, function(response){
+      //   console.log(response)
+      // });
+      var response = {
+        "dataObj": [{
+          "id":"1",
+          "account_name":"Edmund Cinco",
+          "account_number":"1234567890",
+          "amount":"10,000",
+          "ref_id":"111222",
+          "status":"in_process",
+          "created_at":"2017-07-15 16:34:47",
+          "updated_at":"0000-00-00 00:00:00"
+        }, {
+          "id":"2",
+          "account_name":"Mark Zuckerberg",
+          "account_number":"0987654321",
+          "amount":"15,720",
+          "ref_id":"333444",
+          "status":"done",
+          "created_at":"2017-07-15 16:36:34",
+          "updated_at":"2017-07-15 17:24:21"
+        }, {
+          "id":"3",
+          "account_name":"Test",
+          "account_number":"11",
+          "amount":"1000",
+          "ref_id":"555666",
+          "status":"in_process",
+          "created_at":"2017-07-15 16:49:31",
+          "updated_at":"0000-00-00 00:00:00"
+        },{
+          "id":"5",
+          "account_name":"test",
+          "account_number":"11",
+          "amount":"1000",
+          "ref_id":"871562",
+          "status":"in_process",
+          "created_at":"2017-07-15 17:36:49",
+          "updated_at":"0000-00-00 00:00:00"
+        },{
+          "id":"4",
+          "account_name":"Test",
+          "account_number":"11",
+          "amount":"20000",
+          "ref_id":"5969DAFE7217",
+          "status":"in_process",
+          "created_at":"2017-07-15 17:06:06",
+          "updated_at":"0000-00-00 00:00:00"
+        }]
+      }
+      for(var x = 0; x < response.dataObj.length; x++){
+        var rowClone = $('.prototype .depositQueueTableRow').clone()
+        rowClone.find('.referenceNumber').text(response.dataObj[x]['ref_id'])
+        rowClone.find('.accountNumber').text(response.dataObj[x]['account_number'])
+        rowClone.find('.accountName').text(response.dataObj[x]['account_name'])
+        rowClone.find('.amount').text(numberWithCommas(((response.dataObj[x]['amount']).replace(/\s*,\s*|\s+,/g, '')*1).toFixed(2)))
+        rowClone.find('.status').text(response.dataObj[x]['in_process'])
+        $('#depositQueueTable tbody').append(rowClone)
+      }
+      function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
+    }
+  </script>
+</html>
